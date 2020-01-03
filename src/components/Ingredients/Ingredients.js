@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList';
@@ -8,13 +9,28 @@ const  Ingredients = () => {
   const [ingredients,setIngredients] = useState([]);
 
   const addIngredientHandler = ingredient => {
-    setIngredients(prevIngredients => [
-      ...prevIngredients,
-      {
-        id: Math.random().toString(),
-        ...ingredient
-      }
-    ])
+    axios.post('https://react-hooks-9208e.firebaseio.com/ingredients.json',ingredient)
+    .then(response => {
+      console.log(response)
+      setIngredients(prevIngredients => [
+        ...prevIngredients,
+        {
+          id: response.data.name,
+          ...ingredient
+        }
+      ])
+    })
+    .catch(err =>{
+      console.log(err);
+    });
+
+  }
+  const removeIngredientHandler = id => {
+    console.log('removeIngredient')
+    setIngredients(
+        ingredients.filter(ingredient => ingredient.id !== id)
+      )
+     
   }
 
   return (
@@ -23,7 +39,7 @@ const  Ingredients = () => {
 
       <section>
         <Search />
-       <IngredientList ingredients={ingredients} onRemoveItem={()=>{}}/>
+       <IngredientList ingredients={ingredients} onRemoveItem={removeIngredientHandler}/>
       </section>
     </div>
   );
